@@ -14,6 +14,8 @@ import { Link } from "react-router-dom";
 import EnergyConsumptionChart from "../Components/Charts/EnergyConsumptionChart";
 import Loading from "../Components/Loading";
 import { API_URL } from "../data/api";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Home = () => {
   const [data, setData] = useState(null);
@@ -23,6 +25,8 @@ const Home = () => {
   const [todayConsumption, setTodayConsumption] = useState(null);
   const [totalEnergy, setTotalEnergy] = useState(0);
 
+  const notify = () => toast.error("Energy limit exceed!");
+  
   useEffect(() => {
     const fetchPreviousDayEnergy = async () => {
       try {
@@ -46,6 +50,7 @@ const Home = () => {
         );
         setData(response.data);
         setCurrentEnergy(response.data.energy);
+      
       } catch (error) {
         console.error("Error fetching sensor data:", error);
       }
@@ -68,8 +73,10 @@ const Home = () => {
   if (!data) {
     return <div className="flex justify-center items-center w-full"><Loading/></div>;
   }
+
   return (
     <section className="bg-[#F1F4FC] dark:bg-[#1e1e1e] w-full text-[#1F2937] px-3 h-screen overflow-auto 2xl:px-5">
+      <ToastContainer />
       <header className="justify-between flex items-center py-2">
         <h1 className="md:text-2xl 2xl:text-5xl text-xl p-4 font-Audiowide font-bold dark:text-[#e4e2e2]">
           Vishnu Energy Monitoring System
@@ -113,7 +120,7 @@ const Home = () => {
               {data.current.toFixed(3)}
             </p>
             <p className="bg-white px-4 py-1 rounded-full min-[2000px]:px-6 2xl:py-2 max-[450px]:px-2">
-              {todayConsumption}
+              {!todayConsumption? <span>0.00000</span>:todayConsumption}
             </p>
           </div>
           <div className="flex gap-5 rounded-md p-2 text-center items-center justify-between max-[360px]:gap-1">
@@ -163,7 +170,7 @@ const Home = () => {
           <RealTimeEnergyMeter totalEnergy={totalEnergy} />
           <div className="flex flex-col gap-4">
             <RealTimePowerMeter power={data.power.toFixed(3)} />
-            <PowerFactorCharts powerFactor={data.Power_factor.toFixed(3)} />
+            <PowerFactorCharts powerFactor={data.Power_factor.toFixed(3)} /> 
           </div>
         </div>
       </div>
